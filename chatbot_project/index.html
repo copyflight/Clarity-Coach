@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Cloud Chatbot</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        #chatLog { width: 100%; height: 300px; border: 1px solid #ccc; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
+        .user { text-align: right; color: blue; }
+        .bot { text-align: left; color: green; }
+        input[type="text"] { width: 70%; padding: 8px; }
+        button { padding: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Chat with My AI</h1>
+    <div id="chatLog"></div>
+    <input type="text" id="userInput" placeholder="Type here...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const chatLog = document.getElementById('chatLog');
+        const userInput = document.getElementById('userInput');
+
+        //  Important:  Replace this placeholder URL with the actual URL of your deployed serverless function.
+        const YOUR_SERVERLESS_PROXY_URL = 'https://dazzling-nasturtium-6acec9.netlify.app/functions/gemini-chat-proxy.js';  //  <=====  YOU MUST CHANGE THIS LINE
+
+        let conversationTurns = [
+            //  Include your initial prompt to the AI here.  This sets the AI's personality or instructions.
+            { role: "user", parts: [{ text: "You are a friendly assistant that tells jokes." }] },
+            { role: "model", parts: [{ text: "So, are you ready to dive in? We can start right with Module 1: Who Am I?
+If you're game, I'll take on the persona of Clarity Coach and guide you through it. Just let me know when you're ready to answer the first set of questions for Module 1!
+Ready to become a branding black belt? HI-YA! 🥋 (Okay, maybe just a very clear communicator!)!" }] }
+        ];
+
+        function appendToLog(message, type) {
+            const p = document.createElement('p');
+            p.textContent = message;
+            p.className = type;
+            chatLog.appendChild(p);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const userText = userInput.value.trim();
+            if (!userText) return;
+
+            appendToLog(`You: ${userText}`, 'user');
+            userInput.value = '';
+            conversationTurns.push({ role: "user", parts: [{ text: userText }] });
+
+            try {
+                const response = await fetch(YOUR_SERVERLESS_PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ conversation_history: conversationTurns })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    appendToLog(`Bot: Error - ${errorData.error || response.statusText}`, 'bot');
+                    conversationTurns.pop();
+                    return;
+                }
+
+                const data = await response.json();
+                appendToLog(`Bot: ${data.reply}`, 'bot');
+                conversationTurns.push({ role: "model", parts: [{ text: data.reply }] });
+
+            } catch (err) {
+                appendToLog(`Bot: Network Error - ${err.message}`, 'bot');
+                conversationTurns.pop();
+            }
+        }
+        appendToLog('Bot: Ahoy! Type yer message below, matey!', 'bot');
+    </script>
+</body>
+</html>
