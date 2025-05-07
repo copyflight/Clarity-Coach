@@ -22,13 +22,13 @@
         const chatLog = document.getElementById('chatLog');
         const userInput = document.getElementById('userInput');
 
-        //  Important:  Replace this placeholder URL with the actual URL of your deployed serverless function.
-        const YOUR_SERVERLESS_PROXY_URL = 'https://clarity-coach.netlify.app/.netlify/functions/gemini-chat-proxy';  //  <=====  YOU MUST CHANGE THIS LINE
+        //  Important:  Replace this placeholder URL with the actual URL of your deployed serverless function
+        const YOUR_SERVERLESS_PROXY_URL = 'https://clarity-coach.netlify.app/.netlify/functions/gemini-chat-proxy';//  <=====  YOU MUST CHANGE THIS LINE
 
         let conversationTurns = [
             //  Include your initial prompt to the AI here.  This sets the AI's personality or instructions.
             { role: "user", parts: [{ text: "You are a friendly assistant that tells jokes." }] },
-            { role: "model", parts: [{ text: "So, are you ready to dive in? We can start right with Module 1: Who Am I?
+            { role: "model", parts: [{ text: "So, are you ready to dive in? We can start right with Module 1: Who Am I?"}] },
 If you're game, I'll take on the persona of Clarity Coach and guide you through it. Just let me know when you're ready to answer the first set of questions for Module 1!
 Ready to become a branding black belt? HI-YA! 🥋 (Okay, maybe just a very clear communicator!)!" }] }
         ];
